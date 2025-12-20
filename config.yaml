@@ -1,0 +1,68 @@
+# P-CLI 配置文件
+
+# 默认 IDE（可选: cursor, code, windsurf, trae，或自定义命令）
+ide: cursor
+
+# Hooks 定义（在根节点声明，供模板引用）
+# 每个 hook 可以使用 command（命令）或 file（脚本文件名，必须是 .js）
+hooks:
+  gitInit:
+    name: Git 初始化
+    command: git init
+
+  installDeps:
+    name: 安装依赖
+    command: bun install
+
+  taze:
+    name: Taze 递归 major 版本更新
+    command: bunx taze major -r -w
+
+  biome:
+    name: Biome 初始化
+    command: bun add -D --save-exact @biomejs/biome && bunx @biomejs/biome init
+
+  # 自定义脚本示例（file 必须是 .js 文件）:
+  # myScript:
+  #   name: 自定义脚本
+  #   file: my-script.js
+
+# 模板配置
+# 每个模板可以指定需要执行的 hooks 列表（按顺序执行）
+# 使用 command（命令）或 dir（本地模板文件夹名）
+templates:
+  # 空项目模板（p new <name> 的默认配置）
+  empty:
+    name: 空项目
+    hooks:
+      - gitInit
+
+  react:
+    name: React (Vite)
+    command: bun create vite . --template react-ts --rolldown
+    hooks:
+      - gitInit
+      - installDeps
+
+  next:
+    name: Next.js
+    command: bunx create-next-app@latest . --yes
+
+  vue:
+    name: Vue (Vite)
+    command: bun create vite . --template vue-ts --rolldown
+    hooks:
+      - gitInit
+      - installDeps
+
+  remix:
+    name: Remix
+    command: bunx create-react-router@latest . --yes
+
+  # 本地模板模式 - 使用 dir 字段（模板文件夹名）
+  # custom:
+  #   name: 自定义模板
+  #   dir: my-template
+  #   hooks:
+  #     - gitInit
+  #     - installDeps
