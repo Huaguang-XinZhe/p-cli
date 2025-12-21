@@ -150,3 +150,10 @@ agent4, sonnet-4.5:
 怎么显示成这样了？另外，这个 spinner 能不能换一种样式？
 
 --
+
+agent5, auto: 
+
+@powershell (2-12) 模板配置允许只执行 hooks，而没有 command 或 dir。
+
+--
+

@@ -67,7 +67,15 @@ export async function applyTemplate(
 		}
 	}
 
-	return { success: false, message: "模板配置无效（需要 command 或 dir）" };
+	// 仅 hooks 模式 - 如果只有 hooks 而没有 command 或 dir，也是有效的
+	if (template.hooks && template.hooks.length > 0) {
+		return { success: true, message: "模板配置有效（仅执行 hooks）" };
+	}
+
+	return {
+		success: false,
+		message: "模板配置无效（需要 command、dir 或 hooks）",
+	};
 }
 
 /**
