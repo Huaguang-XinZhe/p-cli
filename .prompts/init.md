@@ -157,3 +157,33 @@ agent5, auto:
 
 --
 
+agent5, auto: 
+
+@powershell (25-35) 模板应用失败后，要删除创建的项目目录，以便下次正常重试（不会遇到项目已存在的问题）
+
+--
+
+--
+
+agent5, sonnet-4.5:
+
+- 新增 `p template[s]` 打开 templates 目录，准备添加本地模板
+- 新增 `p template add <project-name>`，添加列表中的某个项目作为模板
+  - add 后边不跟项目名，可交互选择
+  - 如果原项目是 git 仓库，则运行 `git ls-files --cached --others --exclude-standard` 获取所有未被忽略的文件（只复制这些）
+  - 如果不是，那就检查是否有 .gitignore（确保里边有内容），如果有，那就执行 git 初始化后再运行上边的命令，获取所有未被忽略的文件
+  - 如果连 .gitignore 都没有（或没有内容），那就默认忽略 node_modules、dist、build 等目录，然后再复制
+  - 复制完成后（加 spinner），让用户修改原项目的名称（建议 xxx-template，如果用户空置回车，则不修改）
+  - 如果修改失败，则请用户关闭打开那个项目的 IDE 窗口
+  - 本地模板自动注册，不需要在 config.yaml 中声明即可使用（当然，后续可声明 hooks）
+- 新增 `p rename <project-name> <new-project-name>` 命令，如果没写项目名，那就交互式选择和输入
+
+--
+
+agent5, auto:
+
+- 移除一切重命名相关逻辑
+- 新增 `p project[s]` 打开整个 projects 目录
+
+--
+

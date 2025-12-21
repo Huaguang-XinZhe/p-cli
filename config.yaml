@@ -46,13 +46,11 @@ templates:
       - gitInit
 
   # 做 npm 包的模板
-  npm:
-    name: npm 包
+  bun-npm:
+    name: Bun NPM 包
+    dir: bun-tsup
     hooks:
       - gitInit
-      - bunInit
-      - changeset
-      - biome
 
   react:
     name: React (Vite)

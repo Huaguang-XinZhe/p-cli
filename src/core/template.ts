@@ -7,6 +7,48 @@ import { execInDir } from "../utils/shell";
 import { brand } from "../utils/ui";
 
 /**
+ * 获取本地模板目录列表
+ */
+export async function getLocalTemplates(): Promise<
+	Record<string, TemplateConfig>
+> {
+	const localTemplates: Record<string, TemplateConfig> = {};
+
+	if (!(await fse.pathExists(TEMPLATES_DIR))) {
+		return localTemplates;
+	}
+
+	const entries = await fse.readdir(TEMPLATES_DIR, { withFileTypes: true });
+
+	for (const entry of entries) {
+		if (entry.isDirectory()) {
+			// 自动注册本地模板
+			localTemplates[entry.name] = {
+				name: entry.name,
+				dir: entry.name,
+			};
+		}
+	}
+
+	return localTemplates;
+}
+
+/**
+ * 合并配置中的模板和本地模板
+ */
+export async function getAllTemplates(
+	configTemplates: Record<string, TemplateConfig>,
+): Promise<Record<string, TemplateConfig>> {
+	const localTemplates = await getLocalTemplates();
+
+	// 配置中的模板优先级更高（可以覆盖本地模板的配置）
+	return {
+		...localTemplates,
+		...configTemplates,
+	};
+}
+
+/**
  * 应用模板到项目目录
  */
 export async function applyTemplate(
@@ -84,9 +126,17 @@ export async function applyTemplate(
 export function getTemplateChoices(
 	templates: Record<string, TemplateConfig>,
 ): Array<{ value: string; label: string; hint?: string }> {
-	return Object.entries(templates).map(([key, template]) => ({
-		value: key,
-		label: template.name,
-		hint: template.command ? "命令模式" : "本地模板",
-	}));
+	return Object.entries(templates).map(([key, template]) => {
+		let hint: string | undefined;
+		if (template.command) {
+			hint = "命令模式";
+		} else if (template.dir) {
+			hint = "本地模板";
+		}
+		return {
+			value: key,
+			label: template.name,
+			hint,
+		};
+	});
 }

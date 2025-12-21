@@ -45,6 +45,37 @@ export async function execInDir(
 }
 
 /**
+ * 在指定目录执行命令并捕获输出（用于需要解析输出的场景）
+ */
+export async function execAndCapture(
+	command: string,
+	cwd: string,
+): Promise<{ success: boolean; output: string }> {
+	try {
+		const isWindows = process.platform === "win32";
+		const shell = isWindows ? process.env.COMSPEC || "cmd.exe" : "/bin/sh";
+		const shellArgs = isWindows ? ["/c"] : ["-c"];
+
+		const proc = Bun.spawn([shell, ...shellArgs, command], {
+			cwd,
+			stdio: ["pipe", "pipe", "pipe"], // 捕获输出
+			env: process.env,
+		});
+
+		const exitCode = await proc.exited;
+		const output = await new Response(proc.stdout).text();
+
+		return {
+			success: exitCode === 0,
+			output: output.trim(),
+		};
+	} catch (error) {
+		const err = error as Error;
+		return { success: false, output: err.message };
+	}
+}
+
+/**
  * 用 IDE 打开路径
  */
 export async function openWithIDE(ide: string, path: string): Promise<void> {

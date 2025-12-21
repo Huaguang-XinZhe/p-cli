@@ -38,6 +38,9 @@ p new
 # 列出所有项目（显示模板类型）
 p ls
 
+# 打开项目目录
+p project
+
 # 打开项目（交互选择）
 p open
 
@@ -52,6 +55,19 @@ p delete my-project
 
 # 删除所有项目（带进度显示）
 p delete all
+```
+
+### 管理模板
+
+```bash
+# 打开本地模板目录
+p template
+
+# 添加项目为本地模板（交互选择）
+p template add
+
+# 添加指定项目为本地模板
+p template add my-project
 ```
 
 ### 配置和元数据
@@ -200,7 +216,32 @@ templates:
 
 ## 本地模板
 
-在 `~/.p-cli/templates/` 中创建模板文件夹，然后在配置中使用 `dir` 字段引用：
+### 方式一：使用 `p template add` 命令
+
+```bash
+# 交互式选择项目添加为模板
+p template add
+
+# 或直接指定项目名
+p template add my-project
+```
+
+工具会自动：
+1. 检查项目是否是 git 仓库，如果是则使用 `git ls-files` 获取未被忽略的文件
+2. 如果不是 git 仓库但有 `.gitignore`，则临时初始化 git 后获取文件列表
+3. 如果没有 `.gitignore`，则使用默认忽略规则（node_modules、dist、build 等）
+4. 复制文件到 `~/.p-cli/templates/` 目录
+
+### 方式二：手动创建
+
+在 `~/.p-cli/templates/` 中创建模板文件夹：
+
+```bash
+# 打开模板目录
+p template
+```
+
+然后在配置中使用 `dir` 字段引用：
 
 ```yaml
 templates:
@@ -210,6 +251,8 @@ templates:
     hooks:
       - gitInit
 ```
+
+**注意：** 本地模板会自动注册，即使不在 `config.yaml` 中声明也可以使用。如果需要挂载 hooks，再在配置中声明即可。
 
 ## 更新配置
 

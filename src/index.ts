@@ -7,6 +7,8 @@ import { lsCommand } from "./commands/ls";
 import { metaCommand } from "./commands/meta";
 import { newCommand } from "./commands/new";
 import { openCommand } from "./commands/open";
+import { projectCommand } from "./commands/project";
+import { templateCommand } from "./commands/template";
 import { ensureInitialized } from "./core/config";
 import { brand } from "./utils/ui";
 
@@ -25,6 +27,8 @@ program.addCommand(newCommand);
 program.addCommand(lsCommand);
 program.addCommand(openCommand);
 program.addCommand(deleteCommand);
+program.addCommand(projectCommand);
+program.addCommand(templateCommand);
 program.addCommand(configCommand);
 program.addCommand(hookCommand);
 program.addCommand(metaCommand);

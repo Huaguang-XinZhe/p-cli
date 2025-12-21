@@ -10,7 +10,11 @@ import {
 	saveProjectMeta,
 	validateProjectName,
 } from "../core/project";
-import { applyTemplate, getTemplateChoices } from "../core/template";
+import {
+	applyTemplate,
+	getAllTemplates,
+	getTemplateChoices,
+} from "../core/template";
 import { openWithIDE } from "../utils/shell";
 import { bgOrange, brand, printError } from "../utils/ui";
 
@@ -21,6 +25,7 @@ export const newCommand = new Command("new")
 	.option("-t, --template [template]", "使用指定模板")
 	.action(async (name?: string, options?: { template?: string | boolean }) => {
 		const config = loadConfig();
+		const allTemplates = await getAllTemplates(config.templates);
 
 		// 快速模式：只有项目名，没有 -t 参数 → 使用 empty 模板
 		const isQuickMode = name && !options?.template;
@@ -104,7 +109,7 @@ export const newCommand = new Command("new")
 
 		// 2. 获取模板
 		let templateKey: string;
-		const templateChoices = getTemplateChoices(config.templates);
+		const templateChoices = getTemplateChoices(allTemplates);
 
 		if (options?.template === true || options?.template === "") {
 			// -t 没有值，显示选择菜单
@@ -121,10 +126,10 @@ export const newCommand = new Command("new")
 		} else if (options?.template) {
 			// -t 有值
 			templateKey = options.template;
-			if (!config.templates[templateKey]) {
+			if (!allTemplates[templateKey]) {
 				printError(`模板不存在: ${templateKey}`);
 				console.log(
-					pc.dim(`可用模板: ${Object.keys(config.templates).join(", ")}`),
+					pc.dim(`可用模板: ${Object.keys(allTemplates).join(", ")}`),
 				);
 				process.exit(1);
 			}
@@ -142,7 +147,7 @@ export const newCommand = new Command("new")
 			templateKey = result as string;
 		}
 
-		const template = config.templates[templateKey];
+		const template = allTemplates[templateKey];
 		if (!template) {
 			printError(`模板不存在: ${templateKey}`);
 			process.exit(1);
