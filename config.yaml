@@ -10,6 +10,10 @@ hooks:
     name: Git 初始化
     command: git init
 
+  bunInit:
+    name: Bun 初始化
+    command: bun init -y
+
   installDeps:
     name: 安装依赖
     command: bun install
@@ -21,6 +25,10 @@ hooks:
   biome:
     name: Biome 初始化
     command: bun add -D --save-exact @biomejs/biome && bunx @biomejs/biome init
+
+  changeset:
+    name: Changeset 初始化
+    command: bun add -D changeset && bunx changeset init
 
   # 自定义脚本示例（file 必须是 .js 文件）:
   # myScript:
@@ -36,6 +44,15 @@ templates:
     name: 空项目
     hooks:
       - gitInit
+
+  # 做 npm 包的模板
+  npm:
+    name: npm 包
+    hooks:
+      - gitInit
+      - bunInit
+      - changeset
+      - biome
 
   react:
     name: React (Vite)
