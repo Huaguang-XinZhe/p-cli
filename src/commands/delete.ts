@@ -50,7 +50,7 @@ export const deleteCommand = new Command("delete")
 			// 确认删除
 			const shouldDelete = await confirm({
 				message: `确定要删除 ${brand.primary(String(projects.length))} 个项目吗？此操作不可恢复！`,
-				initialValue: false,
+				initialValue: true,
 			});
 
 			if (isCancel(shouldDelete) || !shouldDelete) {
@@ -167,7 +167,7 @@ export const deleteCommand = new Command("delete")
 		// 确认删除
 		const shouldDelete = await confirm({
 			message: `确定要删除项目 ${brand.primary(projectName)} 吗？此操作不可恢复！`,
-			initialValue: false,
+			initialValue: true,
 		});
 
 		if (isCancel(shouldDelete) || !shouldDelete) {

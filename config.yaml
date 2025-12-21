@@ -28,7 +28,7 @@ hooks:
 
   changeset:
     name: Changeset 初始化
-    command: bun add -D changeset && bunx changeset init
+    command: bun add -D @changesets/cli && bunx changeset init
 
   # 自定义脚本示例（file 必须是 .js 文件）:
   # myScript:

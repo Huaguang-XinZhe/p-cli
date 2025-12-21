@@ -169,6 +169,12 @@ export const newCommand = new Command("new")
 		const templateResult = await applyTemplate(template, projectPath);
 
 		if (!templateResult.success) {
+			// 模板应用失败，删除已创建的项目目录
+			try {
+				await fse.remove(projectPath);
+			} catch {
+				// 忽略删除失败的错误，继续显示模板应用失败的错误
+			}
 			printError(templateResult.message);
 			process.exit(1);
 		}
