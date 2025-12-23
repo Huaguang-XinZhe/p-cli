@@ -6,171 +6,10 @@ import pc from "picocolors";
 
 import { loadConfig } from "../core/config";
 import { getProjectPath, listProjects, projectExists } from "../core/project";
+import { collectProjectFiles, copyFiles } from "../utils/files";
 import { TEMPLATES_DIR } from "../utils/paths";
-import { execAndCapture, openWithIDE } from "../utils/shell";
+import { openWithIDE } from "../utils/shell";
 import { bgOrange, brand, printError, printInfo } from "../utils/ui";
-
-/**
- * 检查目录是否是 git 仓库
- */
-async function isGitRepo(projectPath: string): Promise<boolean> {
-	return await fse.pathExists(join(projectPath, ".git"));
-}
-
-/**
- * 检查是否有有效的 .gitignore
- */
-async function hasValidGitignore(projectPath: string): Promise<boolean> {
-	const gitignorePath = join(projectPath, ".gitignore");
-	if (!(await fse.pathExists(gitignorePath))) {
-		return false;
-	}
-
-	const content = await fse.readFile(gitignorePath, "utf-8");
-	return content.trim().length > 0;
-}
-
-/**
- * 获取需要复制的文件列表
- */
-async function getFilesToCopy(
-	projectPath: string,
-): Promise<{ success: boolean; files: string[]; message?: string }> {
-	const isGit = await isGitRepo(projectPath);
-	const hasGitignore = await hasValidGitignore(projectPath);
-
-	// 如果是 git 仓库，直接运行 git ls-files
-	if (isGit) {
-		const result = await execAndCapture(
-			"git ls-files --cached --others --exclude-standard",
-			projectPath,
-		);
-
-		if (result.success) {
-			const files = result.output
-				.split("\n")
-				.map((f) => f.trim())
-				.filter((f) => f.length > 0);
-			return { success: true, files };
-		}
-
-		return {
-			success: false,
-			files: [],
-			message: "无法获取 git 文件列表",
-		};
-	}
-
-	// 如果有有效的 .gitignore，先初始化 git，然后获取文件列表
-	if (hasGitignore) {
-		// 临时初始化 git
-		const initResult = await execAndCapture("git init", projectPath);
-		if (!initResult.success) {
-			return {
-				success: false,
-				files: [],
-				message: "Git 初始化失败",
-			};
-		}
-
-		const lsResult = await execAndCapture(
-			"git ls-files --cached --others --exclude-standard",
-			projectPath,
-		);
-
-		// 删除临时 .git 目录
-		await fse.remove(join(projectPath, ".git"));
-
-		if (lsResult.success) {
-			const files = lsResult.output
-				.split("\n")
-				.map((f) => f.trim())
-				.filter((f) => f.length > 0);
-			return { success: true, files };
-		}
-
-		return {
-			success: false,
-			files: [],
-			message: "无法获取文件列表",
-		};
-	}
-
-	// 如果没有 .gitignore，使用默认忽略规则
-	const defaultIgnores = [
-		"node_modules",
-		"dist",
-		"build",
-		".next",
-		".nuxt",
-		".output",
-		"coverage",
-		".vscode",
-		".idea",
-		"*.log",
-		".DS_Store",
-		"Thumbs.db",
-	];
-
-	const files: string[] = [];
-
-	// 递归遍历目录
-	async function walk(dir: string, relativePath = "") {
-		const entries = await fse.readdir(dir, { withFileTypes: true });
-
-		for (const entry of entries) {
-			const entryPath = join(dir, entry.name);
-			const relPath = relativePath
-				? `${relativePath}/${entry.name}`
-				: entry.name;
-
-			// 检查是否应该忽略
-			const shouldIgnore = defaultIgnores.some((pattern) => {
-				if (pattern.includes("*")) {
-					// 简单的通配符匹配
-					const regex = new RegExp(
-						`^${pattern.replace(/\*/g, ".*").replace(/\./g, "\\.")}$`,
-					);
-					return regex.test(entry.name);
-				}
-				return entry.name === pattern || relPath.includes(`/${pattern}/`);
-			});
-
-			if (shouldIgnore) {
-				continue;
-			}
-
-			if (entry.isDirectory()) {
-				await walk(entryPath, relPath);
-			} else {
-				files.push(relPath);
-			}
-		}
-	}
-
-	await walk(projectPath);
-	return { success: true, files };
-}
-
-/**
- * 复制文件到模板目录
- */
-async function copyFilesToTemplate(
-	sourcePath: string,
-	targetPath: string,
-	files: string[],
-): Promise<void> {
-	await fse.ensureDir(targetPath);
-
-	for (const file of files) {
-		const src = join(sourcePath, file);
-		const dest = join(targetPath, file);
-
-		// 确保目标目录存在
-		await fse.ensureDir(join(dest, ".."));
-		await fse.copy(src, dest);
-	}
-}
 
 export const templateCommand = new Command("template")
 	.alias("templates")
@@ -255,7 +94,7 @@ export const templateCommand = new Command("template")
 			const s = spinner();
 			s.start("正在分析项目文件...");
 
-			const { success, files, message } = await getFilesToCopy(sourcePath);
+			const { success, files, message } = await collectProjectFiles(sourcePath);
 
 			if (!success) {
 				s.stop("分析失败");
@@ -276,7 +115,7 @@ export const templateCommand = new Command("template")
 			copySpinner.start(`正在复制文件到模板目录...`);
 
 			try {
-				await copyFilesToTemplate(sourcePath, targetPath, files);
+				await copyFiles(sourcePath, targetPath, files);
 				copySpinner.stop(
 					`${brand.success("✓")} 文件已复制到: ${brand.primary(targetPath)}`,
 				);

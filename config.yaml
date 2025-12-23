@@ -30,6 +30,10 @@ hooks:
     name: Changeset 初始化
     command: bun add -D @changesets/cli && bunx changeset init
 
+  vitest:
+    name: 安装 Vitest（React）依赖
+    command: bun add -D vitest jsdom @testing-library/react @testing-library/jest-dom
+
   # 自定义脚本示例（file 必须是 .js 文件）:
   # myScript:
   #   name: 自定义脚本
@@ -42,8 +46,10 @@ templates:
   # 空项目模板（p new <name> 的默认配置）
   empty:
     name: 空项目
-    hooks:
-      - gitInit
+
+  shadcn:
+    name: shadcn/ui 项目（询问项目名时，输入 . 在项目根目录下创建）
+    command: bunx --bun shadcn@latest init
 
   # 做 npm 包的模板
   bun-npm:
@@ -71,8 +77,24 @@ templates:
       - installDeps
 
   remix:
-    name: Remix
+    name: Remix(Docker)
     command: bunx create-react-router@latest . --yes
+    hooks:
+      - biome
+
+  remix-cf:
+    name: Remix(React Router) Cloudflare
+    command: bun create react-router@latest . --template https://github.com/remix-run/react-router-templates/tree/main/cloudflare --no-git-init --no-install "--framework=react-router"
+    hooks:
+      - gitInit
+      - biome
+      - vitest
+
+  react-router-cf:
+    name: React Router v7 + CF Workers
+    dir: react-router-cf
+    hooks:
+      - gitInit
 
   # 本地模板模式 - 使用 dir 字段（模板文件夹名）
   # custom:

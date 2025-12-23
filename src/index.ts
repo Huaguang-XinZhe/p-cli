@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 import { Command } from "commander";
+import { addCommand } from "./commands/add";
 import { configCommand } from "./commands/config";
 import { deleteCommand } from "./commands/delete";
 import { hookCommand } from "./commands/hook";
@@ -23,6 +24,7 @@ program
 	.version("1.0.0");
 
 // 注册子命令
+program.addCommand(addCommand);
 program.addCommand(newCommand);
 program.addCommand(lsCommand);
 program.addCommand(openCommand);
