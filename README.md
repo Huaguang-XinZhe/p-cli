@@ -32,6 +32,19 @@ p new my-project -t react
 p new
 ```
 
+### 向当前目录添加模板或项目（整目录拷贝）
+
+```bash
+# 交互式选择来源并填写别名、目标基路径（默认 .）
+p add
+
+# 将模板目录复制到当前目录，重命名为 my-app
+p add react:my-app .
+
+# 将已有项目目录复制到 packages/api 下（目录名沿用项目名）
+p add my-project packages/api
+```
+
 ### 管理项目
 
 ```bash
@@ -100,26 +113,26 @@ p meta
 
 ```yaml
 # 默认 IDE
-ide: cursor  # 可选: cursor, code, windsurf, trae
+ide: cursor # 可选: cursor, code, windsurf, trae
 
 # Hooks 定义（在根节点声明，供模板引用）
 hooks:
   gitInit:
     name: Git 初始化
     command: git init
-  
+
   installDeps:
     name: 安装依赖
     command: bun install
-  
+
   taze:
     name: Taze 递归 major 版本更新
     command: bunx taze major -r -w
-  
+
   biome:
     name: Biome 初始化
     command: bun add -D --save-exact @biomejs/biome && bunx @biomejs/biome init
-  
+
   # 自定义脚本示例（file 必须是 .js 文件，在 ~/.p-cli/hooks/ 下）
   myScript:
     name: 自定义脚本
@@ -139,13 +152,13 @@ templates:
     hooks:
       - gitInit
       - installDeps
-  
+
   next:
     name: Next.js
     command: bunx create-next-app@latest . --ts --tailwind --app --src-dir --no-import-alias --yes
     hooks:
       - gitInit
-  
+
   # 本地模板（dir 为模板文件夹名，在 ~/.p-cli/templates/ 下）
   custom:
     name: 自定义模板
@@ -158,22 +171,22 @@ templates:
 
 ## 内置模板
 
-| 模板 | 描述 |
-|------|------|
-| `empty` | 空项目（仅 git init） |
-| `react` | React + Vite + TypeScript |
-| `next` | Next.js + TypeScript + Tailwind |
-| `vue` | Vue + Vite + TypeScript |
-| `remix` | Remix (React Router) |
+| 模板    | 描述                            |
+| ------- | ------------------------------- |
+| `empty` | 空项目（仅 git init）           |
+| `react` | React + Vite + TypeScript       |
+| `next`  | Next.js + TypeScript + Tailwind |
+| `vue`   | Vue + Vite + TypeScript         |
+| `remix` | Remix (React Router)            |
 
 ## 内置 Hooks
 
-| Hook | 描述 |
-|------|------|
-| `gitInit` | Git 仓库初始化 |
-| `installDeps` | 安装依赖 (bun install) |
-| `taze` | 递归更新依赖到最新 major 版本 |
-| `biome` | 初始化 Biome 代码格式化工具 |
+| Hook          | 描述                          |
+| ------------- | ----------------------------- |
+| `gitInit`     | Git 仓库初始化                |
+| `installDeps` | 安装依赖 (bun install)        |
+| `taze`        | 递归更新依赖到最新 major 版本 |
+| `biome`       | 初始化 Biome 代码格式化工具   |
 
 ## 自定义 Hooks
 
@@ -198,7 +211,7 @@ console.log(`模板: ${templateName}`);
 hooks:
   myScript:
     name: 自定义脚本
-    file: my-script.js  # 必须是 .js 文件
+    file: my-script.js # 必须是 .js 文件
 ```
 
 3. 在模板的 `hooks` 列表中引用：
@@ -211,7 +224,7 @@ templates:
     hooks:
       - gitInit
       - installDeps
-      - myScript  # 引用自定义 hook
+      - myScript # 引用自定义 hook
 ```
 
 ## 本地模板
@@ -227,6 +240,7 @@ p template add my-project
 ```
 
 工具会自动：
+
 1. 检查项目是否是 git 仓库，如果是则使用 `git ls-files` 获取未被忽略的文件
 2. 如果不是 git 仓库但有 `.gitignore`，则临时初始化 git 后获取文件列表
 3. 如果没有 `.gitignore`，则使用默认忽略规则（node_modules、dist、build 等）
@@ -247,7 +261,7 @@ p template
 templates:
   myTemplate:
     name: 我的自定义模板
-    dir: my-template  # 文件夹名，不需要完整路径
+    dir: my-template # 文件夹名，不需要完整路径
     hooks:
       - gitInit
 ```

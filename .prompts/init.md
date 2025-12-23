@@ -32,7 +32,7 @@ plan, opus-4.5：
 
 --
 
-edit-plan: 
+edit-plan:
 
 把 Plan 中的 use 改成了 open
 
@@ -50,7 +50,7 @@ agent, opus-4.5：
 
 --
 
-agent, opus-4.5: 
+agent, opus-4.5:
 
 - 使用 `p delete <project-name>` 或 `p delete` 选择来实现删除项目的功能
 
@@ -93,7 +93,7 @@ agent2, sonnet-4.5：
 
 --
 
-agent2, sonnet-4.5: 
+agent2, sonnet-4.5:
 
 - 自定义 template 配置使用 dir 指定文件夹名更合适
 - 我更新了项目中的 config.yaml，然后 `bun run build` -> `bun link`，结果发现 `.p-cli` 中的配置文件没有同步变化，修复一下
@@ -124,7 +124,7 @@ agent2, sonnet-4.5：
 
 --
 
-agent2, auto: 
+agent2, auto:
 
 - 既然同步删除会影响 spinner，那为什么不做成异步的呢？（可以异步并发删除吗？）
 - 把 fs 全部换成 fs-extra（fse），它的 API 更简洁、现代
@@ -137,13 +137,13 @@ ask3, sonnet-4.5：
 
 --
 
-agent3, auto: 
+agent3, auto:
 
 用 Bun.spawn 实现
 
 --
 
-agent4, sonnet-4.5: 
+agent4, sonnet-4.5:
 
 ![image-20251221023239302](https://image-bed-1315938829.cos.ap-nanjing.myqcloud.com/new/image-20251221023239302.png)
 
@@ -151,13 +151,13 @@ agent4, sonnet-4.5:
 
 --
 
-agent5, auto: 
+agent5, auto:
 
 @powershell (2-12) 模板配置允许只执行 hooks，而没有 command 或 dir。
 
 --
 
-agent5, auto: 
+agent5, auto:
 
 @powershell (25-35) 模板应用失败后，要删除创建的项目目录，以便下次正常重试（不会遇到项目已存在的问题）
 
@@ -187,3 +187,16 @@ agent5, auto:
 
 --
 
+agent6, auto:
+
+新增命令：p add [<template-name>|<project-name>] [.|<relative-path>]`，把某个模板或项目添加到当前项目根目录/某个路径下（add 处回车可交互式添加）
+
+--
+
+agent6, auto:
+
+你错了！不是把模板或项目中的文件复制到指定路径，而是把整个模板或项目目录添加进去。
+
+另外，命令变成这样：`p add name:alias_name path`，支持重命名后添加，交互式也要支持。
+
+--
